@@ -21,11 +21,11 @@
     </el-upload>
   </el-card>
   <Card style="height: 400px">
-    <div class="demo-upload-list" v-for="(item,id) in uploadList" v-bind:key="id">
+    <div class="demo-upload-list" v-for="item in uploadList" :key="item.id">
       <template v-if="item.status === 'finished'">
         <Image :src="item.url" fit="cover" width="100%" height="100%"/>
         <div class="demo-upload-list-cover">
-          <Icon type="ios-eye-outline" @click="handleView(item.name)"></Icon>
+          <Icon type="ios-eye-outline" @click="handleView(item.url)"></Icon>
           <Icon type="ios-trash-outline" @click="handleRemove(item)"></Icon>
         </div>
       </template>
@@ -47,13 +47,14 @@
         multiple
         type="drag"
         :action="uploadUrl"
-        style="display: inline-block;width:58px;">
-      <div style="width: 58px;height:58px;line-height: 58px;">
+        style="display: inline-block;width:80px;">
+      <div style="width: 80px;height:80px;line-height: 80px;">
         <Icon type="ios-camera" size="20"></Icon>
       </div>
     </Upload>
+    <div class="tip-style">注意: 最大5M, 最多3张, 必须为jpg, jpeg, png, gif格式</div>
   </Card>
-  <ImagePreview v-model="visible" :preview-list="['https://file.iviewui.com/images/' + imgName]"/>
+  <ImagePreview v-model="visible" :preview-list="[url]"/>
 </template>
 
 <script>
@@ -64,17 +65,8 @@ export default {
   data() {
     return {
       uploadUrl: "http://localhost:8099/aliyunoss/upload",
-      defaultList: [
-        {
-          'name': 'image-demo-1.jpg',
-          'url': 'https://file.iviewui.com/images/image-demo-1.jpg'
-        },
-        {
-          'name': 'image-demo-2.jpg',
-          'url': 'https://file.iviewui.com/images/image-demo-2.jpg'
-        }
-      ],
-      imgName: '',
+      defaultList: [],
+      url: '',
       visible: false,
       uploadList: []
     }
@@ -113,8 +105,8 @@ export default {
 
     },
 
-    handleView(name) {
-      this.imgName = name;
+    handleView(url) {
+      this.url = url;
       this.visible = true;
     },
     handleRemove(file) {
@@ -122,11 +114,13 @@ export default {
       this.$refs.upload.fileList.splice(fileList.indexOf(file), 1);
     },
     handleSuccess1(res, file) {
-      if (res) {
+      if (res.code === '200') {
         this.$Notice.success({
           title: '成功！',
           desc: file.name + '已上传成功'
         })
+        file.url = res.data
+        this.defaultList.push(file)
       }
     },
     handleFormatError(file) {
@@ -142,10 +136,10 @@ export default {
       });
     },
     handleBeforeUpload1() {
-      const check = this.uploadList.length < 5;
+      const check = this.uploadList.length < 3;
       if (!check) {
         this.$Notice.warning({
-          title: '最多可以上传5张图片'
+          title: '最多可以上传3张图片'
         });
       }
       return check;
@@ -162,40 +156,49 @@ export default {
 .el-upload__tip {
   color: red;
 }
-.demo-upload-list{
+
+.demo-upload-list {
   display: inline-block;
-  width: 60px;
-  height: 60px;
+  width: 80px;
+  height: 80px;
   text-align: center;
-  line-height: 60px;
+  line-height: 80px;
   border: 1px solid transparent;
   border-radius: 4px;
   overflow: hidden;
   background: #fff;
   position: relative;
-  box-shadow: 0 1px 1px rgba(0,0,0,.2);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, .2);
   margin-right: 4px;
 }
-.demo-upload-list img{
+
+.demo-upload-list img {
   width: 100%;
   height: 100%;
 }
-.demo-upload-list-cover{
+
+.demo-upload-list-cover {
   display: none;
   position: absolute;
   top: 0;
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(0,0,0,.6);
+  background: rgba(0, 0, 0, .6);
 }
-.demo-upload-list:hover .demo-upload-list-cover{
+
+.demo-upload-list:hover .demo-upload-list-cover {
   display: block;
 }
-.demo-upload-list-cover i{
+
+.demo-upload-list-cover i {
   color: #fff;
   font-size: 20px;
   cursor: pointer;
   margin: 0 2px;
+}
+
+.tip-style {
+  color: red;
 }
 </style>
