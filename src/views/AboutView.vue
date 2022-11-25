@@ -10,12 +10,13 @@
         :before-upload="handleBeforeUpload"
         multiple
     >
+      <Icon type="md-cloud-upload" size="100" color="#409eff"/>
       <div class="el-upload__text">
         拖拽文件到这或 <em>点击上传</em>
       </div>
       <template #tip>
         <div class="el-upload__tip">
-          Tips：文件大小不能超过5MB
+          Tips：文件大小不能超过100MB
         </div>
       </template>
     </el-upload>
@@ -49,7 +50,7 @@
         :action="uploadUrl"
         style="display: inline-block;width:80px;">
       <div style="width: 80px;height:80px;line-height: 80px;">
-        <Icon type="ios-camera" size="20"></Icon>
+        <Icon type="ios-camera" size="30"></Icon>
       </div>
     </Upload>
     <div class="tip-style">注意: 最大5M, 最多3张, 必须为jpg, jpeg, png, gif格式</div>
@@ -62,13 +63,19 @@ import {Card} from "view-ui-plus";
 
 export default {
   components: {Card},
+  props: {
+    storeType: {
+      type: Number,
+      default: 1
+    }
+  },
   data() {
     return {
-      uploadUrl: "http://localhost:8099/aliyunoss/upload",
+      uploadUrl: "http://localhost:8099/aliyunoss/upload?storeType=" + this.storeType,
       defaultList: [],
       url: '',
       visible: false,
-      uploadList: []
+      uploadList: [],
     }
   },
 
@@ -97,11 +104,12 @@ export default {
 
     // 上传前校验
     handleBeforeUpload(file) {
-      let isLt5MB = file.size / 1024 / 1024 > 5;
-      if (isLt5MB) {
-        this.$message.warning("上传的文件不能超过5MB")
+      let isLg100MB = file.size / 1024 / 1024 > 100;
+      if (isLg100MB) {
+        this.$message.warning("上传的文件不能超过100MB")
       }
       // 文件类型校验
+
 
     },
 
