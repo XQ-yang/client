@@ -1,6 +1,7 @@
 <template>
   <el-card>
     <el-upload
+        ref="upload"
         class="upload-demo"
         drag
         :action="uploadUrl"
@@ -12,12 +13,18 @@
     >
       <Icon type="md-cloud-upload" size="100" color="#409eff"/>
       <div class="el-upload__text">
-        拖拽文件到这或 <em>点击上传</em>
+        拖拽文件到这或 <em>点击选择文件</em>
       </div>
       <template #tip>
         <div class="el-upload__tip">
           Tips：文件大小不能超过100MB
         </div>
+<!--        存储方式：-->
+<!--        <el-radio-group v-model="storeType">-->
+<!--          <el-radio :label=1 size="default">本地存储</el-radio>-->
+<!--          <el-radio :label=2 size="default">阿里云OSS</el-radio>-->
+<!--        </el-radio-group>-->
+<!--        <el-button type="primary" @click="uploadHandle">上传</el-button>-->
       </template>
     </el-upload>
   </el-card>
@@ -63,19 +70,20 @@ import {Card} from "view-ui-plus";
 
 export default {
   components: {Card},
-  props: {
-    storeType: {
-      type: Number,
-      default: 1
+  props:{
+    storeType:{
+      type:Number,
+      default:1
     }
   },
   data() {
     return {
-      uploadUrl: "http://localhost:8099/aliyunoss/upload?storeType=" + this.storeType,
+      uploadUrl: 'http://localhost:8099/aliyunoss/upload?storeType=' + this.storeType,
       defaultList: [],
       url: '',
       visible: false,
       uploadList: [],
+      upFile:new FormData()
     }
   },
 
@@ -84,6 +92,7 @@ export default {
   },
 
   methods: {
+
 
     handleChange(file, fileList) {
       console.log("file---", file);
